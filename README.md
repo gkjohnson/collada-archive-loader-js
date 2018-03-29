@@ -3,6 +3,7 @@
 # zipped-collada-loader-js
 THREE js loader for loading a zipped ZAE Collada file
 
+https://forums.khronos.org/showthread.php/10740-example-zae-files
 
 ### Archive Packaging
 [From the Collada 1.5 spec.](https://www.khronos.org/files/collada_spec_1_5.pdf)
