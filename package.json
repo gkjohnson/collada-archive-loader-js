@@ -1,0 +1,28 @@
+{
+  "name": "collada-archive-loader",
+  "version": "1.0.0",
+  "description": "**In Progress**",
+  "main": "ColladaArchiveLoader.js",
+  "scripts": {
+    "start": "static-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gkjohnson/zipped-collada-loader-js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gkjohnson/zipped-collada-loader-js/issues"
+  },
+  "homepage": "https://github.com/gkjohnson/zipped-collada-loader-js#readme",
+  "devDependencies": {
+    "jszip": "^3.1.5",
+    "static-server": "^2.2.0",
+    "three": "^0.91.0"
+  },
+  "peerDependencies": {
+    "jszip": "^3.1.5",
+    "three": "^0.91.0"
+  }
+}
