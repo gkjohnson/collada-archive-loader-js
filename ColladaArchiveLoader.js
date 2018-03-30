@@ -30,7 +30,26 @@ THREE.ColladaArchiveLoader.prototype = {
 
     },
 
-    parse: function ( data, onLoad ) { 
+    parse: function( data, onLoad ) { 
+
+        function cleanPath( path ) {
+
+            if ( /^file:/.test( path ) ) {
+
+                console.warn( 'ColladaArchiveLoader : file:// prefixes not supported.' );
+                return '';
+
+            }
+
+            path = path.replace( /\\+/g, '/' );
+            path = path.replace( /^\.?\//, '' );
+
+            var updir = path.match( /(\.\.\/)*/ )[ 0 ].match( /\.\./g ).length;
+            var spl = path.split( '/' );
+            while (updir --) spl.shift();
+
+            return spl.join( '/' );
+        }
 
         if ( window.JSZip == null ) {
 
@@ -77,12 +96,17 @@ THREE.ColladaArchiveLoader.prototype = {
 
                 }
 
-                // get the dae text
-                // TODO: how does this work if it's nested?
+                entryfile = cleanPath( entryfile );
+
+                // get the dae file and directory
+                var dir = entryfile.replace ( /[^\/]*$/g, '' );
                 var daefile = await zip.file( entryfile ).async( 'string' );
 
                 // set the callback for fetching textures
-                this._colladaLoader.textureLoader = function( image, textureLoader ) {
+                this._colladaLoader.loadTexture = function( image, textureLoader ) {
+
+                    var texpath = cleanPath( `${ dir }/${ image }` );
+                    var data = zip.file( texpath ).async( 'uint8' );
 
                     // TODO: read image from the zip file
                     return textureLoader.load( image );
