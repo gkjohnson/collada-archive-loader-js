@@ -19,7 +19,7 @@ THREE.ColladaArchiveLoader.prototype = {
         var loader = new THREE.FileLoader( scope.manager );
         loader.load( url, function ( data ) { 
 
-            // onLoad( scope.parse( text, path ) );
+            scope.parse( text, onLoad );
 
         }, onProgress, onError );
     },
@@ -34,7 +34,7 @@ THREE.ColladaArchiveLoader.prototype = {
 
         if ( window.JSZip == null ) {
 
-            console.warn( 'ColladaArchiveLoader : JSZip is required to unpack a Collada archive file.' );
+            console.error( 'ColladaArchiveLoader : JSZip is required to unpack a Collada archive file.' );
             return null;
 
         }
@@ -46,13 +46,36 @@ THREE.ColladaArchiveLoader.prototype = {
                 var zip = await ((new JSZip()).loadAsync( data, { base64: true } ));
 
                 var manifest = await zip.file( 'manifest.xml' ).async( 'string' );
-                var manifestxml = (new DOMParser()).parseFromString( manifestxml, 'application/xml' );
+                var entryfile;
 
-                var entryfile = manifestxml
-                    .children
-                    .filter( c => c.tagName === 'dae_root' )[0]
-                    .textContent
-                    .trim();
+                if ( manifest == null ) {
+
+                    var files = zip.file(/\.dae$/);
+
+                    if ( files.length === 0 ) {
+
+                        console.error( 'ColladaArchiveLoader : No manifest found and no Collada file found to load.' );
+
+                    } 
+
+                    if ( files.length >= 2 ) {
+
+                        console.error( 'ColladaArchiveLoader : No manifest found and more than one Collada file found to load.' );
+
+                    }
+
+                    entryfile = files[0].name;
+
+                } else {
+
+                    var manifestxml = manifest && (new DOMParser()).parseFromString( manifestxml, 'application/xml' );
+                    entryfile = manifestxml
+                        .children
+                        .filter( c => c.tagName === 'dae_root' )[0]
+                        .textContent
+                        .trim();
+
+                }
 
                 // get the dae text
                 // TODO: how does this work if it's nested?
