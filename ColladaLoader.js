@@ -52,7 +52,15 @@ THREE.ColladaLoader.prototype = {
 
 	},
 
+	loadTexture: function ( image, textureLoader ) { 
+
+		return textureLoader.load( image );
+
+	},
+
 	parse: function ( text, path ) {
+
+		var scope = this;
 
 		function getElementsByTagName( xml, name ) {
 
@@ -1479,7 +1487,7 @@ THREE.ColladaLoader.prototype = {
 
 				if ( image !== undefined ) {
 
-					var texture = textureLoader.load( image );
+					var texture = scope.loadTexture( image, textureLoader );
 
 					var extra = textureObject.extra;
 
