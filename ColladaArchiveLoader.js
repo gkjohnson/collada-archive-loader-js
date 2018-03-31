@@ -36,7 +36,7 @@ THREE.ColladaArchiveLoader.prototype = {
 
             if ( /^file:/.test( path ) ) {
 
-                console.warn( 'ColladaArchiveLoader : file:// prefixes not supported.' );
+                console.warn( 'ColladaArchiveLoader : file:// URI not supported.' );
                 return '';
 
             }
@@ -64,6 +64,7 @@ THREE.ColladaArchiveLoader.prototype = {
                 
                 var zip = await ((new JSZip()).loadAsync( data, { base64: true } ));
 
+                // Find the entry file
                 var manifest = await zip.file( 'manifest.xml' ).async( 'string' );
                 var entryfile;
 
@@ -105,9 +106,19 @@ THREE.ColladaArchiveLoader.prototype = {
                 // set the callback for fetching textures
                 this._colladaLoader.loadTexture = function( image, textureLoader ) {
 
-                    var texpath = cleanPath( `${ dir }/${ image }` );
-                    var data = zip.file( texpath ).async( 'uint8' );
+                    ( async function () {
+                        var texpath = cleanPath( `${ dir }/${ image }` );
+                        var ext = texpath.match( /[^\.]$/ )[0];
+                        var data = await zip.file( texpath ).async( 'uint8' );
 
+                        // Decode the text data
+                        var data64 = btoa( ( new TextDecoder() ).decode( data ) );
+
+                        // Create data url with the extension
+                        var dataurl = `data:image/png;base64,${ data64 }`;
+
+                    } )()
+                    
                     // TODO: read image from the zip file
                     return textureLoader.load( image );
 
