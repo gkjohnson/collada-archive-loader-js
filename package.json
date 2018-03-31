@@ -1,7 +1,7 @@
 {
   "name": "collada-archive-loader",
-  "version": "1.0.0",
-  "description": "**In Progress**",
+  "version": "0.0.1",
+  "description": "THREE js loader for loading a zipped Collada Archive or ZAE file.",
   "main": "ColladaArchiveLoader.js",
   "scripts": {
     "start": "static-server"
@@ -10,8 +10,8 @@
     "type": "git",
     "url": "git+https://github.com/gkjohnson/zipped-collada-loader-js.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Garrett Johnson <garrett.kjohnson@gmail.com>",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/gkjohnson/zipped-collada-loader-js/issues"
   },
