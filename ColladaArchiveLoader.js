@@ -69,7 +69,7 @@ THREE.ColladaArchiveLoader.prototype = {
 
                 if ( manifest == null ) {
 
-                    var files = zip.file(/\.dae$/);
+                    var files = zip.file( /\.dae$/i );
 
                     if ( files.length === 0 ) {
 
@@ -111,20 +111,11 @@ THREE.ColladaArchiveLoader.prototype = {
 
                         var ext = texpath.match( /[^\.]$/ )[0];
                         var data = await zip.file( texpath ).async( 'uint8array' );
-
-                        // Decode the text data
-                        var data64 = '';
-                        for ( var i = 0, l = data.length; i < l; i ++ ) {
-
-                            data64 += String.fromCharCode( data[i] );
-
-                        }
-
-                        data64 = btoa ( data64 );
+                        var blob = new Blob( [ data ], 'application/octet-binary' );
 
                         // Create data url with the extension
                         tex.image.addEventListener( 'load', () => tex.needsUpdate = true, { once: true } );
-                        tex.image.src = `data:image/png;base64,${ data64 }`;
+                        tex.image.src = URL.createObjectURL( blob );
 
                     } )()
 
