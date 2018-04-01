@@ -16,6 +16,20 @@
     "url": "https://github.com/gkjohnson/zipped-collada-loader-js/issues"
   },
   "homepage": "https://github.com/gkjohnson/zipped-collada-loader-js#readme",
+  "keywords": [
+    "threejs",
+    "three-js",
+    "graphics",
+    "model",
+    "geometry",
+    "collada",
+    "dae",
+    "zae",
+    "archived",
+    "loader",
+    "importer",
+    "javascript"
+  ],
   "devDependencies": {
     "jszip": "^3.1.5",
     "static-server": "^2.2.0",
