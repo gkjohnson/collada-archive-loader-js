@@ -42,7 +42,6 @@ THREE.ColladaArchiveLoader.prototype = {
             path = path.replace( /\\+/g, '/' );
             path = path.replace( /^\.?\//, '' );
 
-            console.log(path)
             var updirmatches = path.match( /(\.\.\/)*/ )[ 0 ].match( /\.\./g );
             var updircount = updirmatches ? updirmatches.length : 0;
             var spl = path.split( '/' );
@@ -109,8 +108,6 @@ THREE.ColladaArchiveLoader.prototype = {
 
                     ( async function () {
                         var texpath = cleanPath( `${ dir }/${ cleanPath(image) }` );
-
-                        console.log(dir, image, `${ dir }/${ image }`, texpath)
 
                         var ext = texpath.match( /[^\.]$/ )[0];
                         var data = await zip.file( texpath ).async( 'uint8array' );
