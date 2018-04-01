@@ -4,16 +4,14 @@ THREE.ColladaArchiveLoader = function ( manager ) {
     // the final processing is async due to jszip
     // this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
     this.manager = THREE.DefaultLoadingManager;
-    
+
     this._colladaLoader = new THREE.ColladaLoader();
 
 }
 
-THREE.ColladaArchiveLoader.prototype = { 
+THREE.ColladaArchiveLoader.prototype = {
 
     constructor: THREE.ColladaArchiveLoader,
-
-    crossOrigin: 'Anonymous',
 
     load: function ( url, onLoad, onProgress, onError ) {
 
@@ -23,14 +21,14 @@ THREE.ColladaArchiveLoader.prototype = {
 
         var loader = new THREE.FileLoader( this.manager );
         loader.setResponseType( 'arraybuffer' );
-        loader.load( url, function ( data ) { 
+        loader.load( url, function ( data ) {
 
             scope.parse( data, onLoad );
 
         }, onProgress, onError );
     },
 
-    parse: function( data, onLoad ) { 
+    parse: function( data, onLoad ) {
 
         function cleanPath( path ) {
 
@@ -61,9 +59,9 @@ THREE.ColladaArchiveLoader.prototype = {
         }
 
         ( async () => {
-            
+
             try {
-                
+
                 var zip = await ((new JSZip()).loadAsync( data ));
 
                 // Find the entry file
@@ -78,7 +76,7 @@ THREE.ColladaArchiveLoader.prototype = {
 
                         console.error( 'ColladaArchiveLoader : No manifest found and no Collada file found to load.' );
 
-                    } 
+                    }
 
                     if ( files.length >= 2 ) {
 
@@ -132,7 +130,7 @@ THREE.ColladaArchiveLoader.prototype = {
                         tex.image.src = `data:image/png;base64,${ data64 }`;
 
                     } )()
-                    
+
                     return tex;
 
                 }
