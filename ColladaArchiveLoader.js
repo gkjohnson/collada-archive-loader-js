@@ -1,6 +1,11 @@
 THREE.ColladaArchiveLoader = function ( manager ) {
 
-    this._colladaLoader = new THREE.ColladaLoader( manager );
+    // TODO: Use this appropriately. It's a little more complicated because
+    // the final processing is async due to jszip
+    // this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+    this.manager = THREE.DefaultLoadingManager;
+    
+    this._colladaLoader = new THREE.ColladaLoader();
 
 }
 
@@ -16,18 +21,13 @@ THREE.ColladaArchiveLoader.prototype = {
 
         var path = scope.path === undefined ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
-        var loader = new THREE.FileLoader( scope.manager );
+        var loader = new THREE.FileLoader( this.manager );
+        loader.setResponseType( 'arraybuffer' );
         loader.load( url, function ( data ) { 
 
-            scope.parse( text, onLoad );
+            scope.parse( data, onLoad );
 
         }, onProgress, onError );
-    },
-
-    setCrossOrigin: function ( value ) {
-
-        this._colladaLoader.setCrossOrigin( value );
-
     },
 
     parse: function( data, onLoad ) { 
@@ -44,9 +44,11 @@ THREE.ColladaArchiveLoader.prototype = {
             path = path.replace( /\\+/g, '/' );
             path = path.replace( /^\.?\//, '' );
 
-            var updir = path.match( /(\.\.\/)*/ )[ 0 ].match( /\.\./g ).length;
+            console.log(path)
+            var updirmatches = path.match( /(\.\.\/)*/ )[ 0 ].match( /\.\./g );
+            var updircount = updirmatches ? updirmatches.length : 0;
             var spl = path.split( '/' );
-            while (updir --) spl.shift();
+            while (updircount --) spl.shift();
 
             return spl.join( '/' );
         }
@@ -58,11 +60,11 @@ THREE.ColladaArchiveLoader.prototype = {
 
         }
 
-        ( async function () {
+        ( async () => {
             
             try {
                 
-                var zip = await ((new JSZip()).loadAsync( data, { base64: true } ));
+                var zip = await ((new JSZip()).loadAsync( data ));
 
                 // Find the entry file
                 var manifest = await zip.file( 'manifest.xml' ).async( 'string' );
@@ -88,9 +90,8 @@ THREE.ColladaArchiveLoader.prototype = {
 
                 } else {
 
-                    var manifestxml = manifest && (new DOMParser()).parseFromString( manifestxml, 'application/xml' );
-                    entryfile = manifestxml
-                        .children
+                    var manifestxml = manifest && (new DOMParser()).parseFromString( manifest, 'application/xml' );
+                    entryfile = [ ...manifestxml.children ]
                         .filter( c => c.tagName === 'dae_root' )[0]
                         .textContent
                         .trim();
@@ -106,26 +107,38 @@ THREE.ColladaArchiveLoader.prototype = {
                 // set the callback for fetching textures
                 this._colladaLoader.loadTexture = function( image, textureLoader ) {
 
+                    var tex = new THREE.Texture( new Image() );
+
                     ( async function () {
-                        var texpath = cleanPath( `${ dir }/${ image }` );
+                        var texpath = cleanPath( `${ dir }/${ cleanPath(image) }` );
+
+                        console.log(dir, image, `${ dir }/${ image }`, texpath)
+
                         var ext = texpath.match( /[^\.]$/ )[0];
-                        var data = await zip.file( texpath ).async( 'uint8' );
+                        var data = await zip.file( texpath ).async( 'uint8array' );
 
                         // Decode the text data
-                        var data64 = btoa( ( new TextDecoder() ).decode( data ) );
+                        var data64 = '';
+                        for ( var i = 0, l = data.length; i < l; i ++ ) {
+
+                            data64 += String.fromCharCode( data[i] );
+
+                        }
+
+                        data64 = btoa ( data64 );
 
                         // Create data url with the extension
-                        var dataurl = `data:image/png;base64,${ data64 }`;
+                        tex.image.addEventListener( 'load', () => tex.needsUpdate = true, { once: true } );
+                        tex.image.src = `data:image/png;base64,${ data64 }`;
 
                     } )()
                     
-                    // TODO: read image from the zip file
-                    return textureLoader.load( image );
+                    return tex;
 
                 }
 
                 // parse the result
-                var result = this._colladaLoader.parse( text );
+                var result = this._colladaLoader.parse( daefile );
 
                 // return the data
                 onLoad( result );
