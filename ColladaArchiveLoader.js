@@ -28,9 +28,10 @@ THREE.ColladaArchiveLoader.prototype = {
         loader.setResponseType( 'arraybuffer' );
         loader.load( url, function ( data ) {
 
-            scope.parse( data, onLoad );
+            onLoad( scope.parse( data ) );
 
         }, onProgress, onError );
+
     },
 
     parse: function( data ) {
@@ -111,7 +112,7 @@ THREE.ColladaArchiveLoader.prototype = {
             // parse the result
             var result = this._colladaLoader.parse( daefile );
 
-            for ( var name in images ) {
+            for ( var name in result.images ) {
                 
                 var image = result.images[ name ];
                 var path = decodeURI( image.init_from );
