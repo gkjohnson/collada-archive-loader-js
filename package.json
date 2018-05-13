@@ -31,12 +31,12 @@
     "javascript"
   ],
   "devDependencies": {
-    "jszip": "^3.1.5",
+    "jszip": "^2.6.0",
     "static-server": "^2.2.0",
     "three": "^0.91.0"
   },
   "peerDependencies": {
-    "jszip": "^3.1.5",
+    "jszip": "^2.6.0",
     "three": "^0.91.0"
   }
 }

@@ -1,3 +1,8 @@
+/**
+ * @author Garrett Johnson / http://gkjohnson.github.io/
+ * https://github.com/gkjohnson/collada-archive-loader-js
+ */
+
 THREE.ColladaArchiveLoader = function ( manager ) {
 
     // TODO: Use this appropriately. It's a little more complicated because
@@ -45,6 +50,9 @@ THREE.ColladaArchiveLoader.prototype = {
             var updirmatches = path.match( /(\.\.\/)*/ )[ 0 ].match( /\.\./g );
             var updircount = updirmatches ? updirmatches.length : 0;
             var spl = path.split( '/' );
+            
+            // TODO: We need to actually modify the parent directory
+            // for every `..`
             while (updircount --) spl.shift();
 
             return spl.join( '/' );
@@ -61,10 +69,10 @@ THREE.ColladaArchiveLoader.prototype = {
 
             try {
 
-                var zip = await ((new JSZip()).loadAsync( data ));
+                var zip = new JSZip(data);
 
                 // Find the entry file
-                var manifest = await zip.file( 'manifest.xml' ).async( 'string' );
+                var manifest = zip.file( 'manifest.xml' ).asText();
                 var entryfile;
 
                 if ( manifest == null ) {
@@ -99,32 +107,21 @@ THREE.ColladaArchiveLoader.prototype = {
 
                 // get the dae file and directory
                 var dir = entryfile.replace ( /[^\/]*$/g, '' );
-                var daefile = await zip.file( entryfile ).async( 'string' );
-
-                // set the callback for fetching textures
-                this._colladaLoader.loadTexture = function( image, textureLoader ) {
-
-                    var tex = new THREE.Texture( new Image() );
-
-                    ( async function () {
-                        var texpath = cleanPath( `${ dir }/${ cleanPath(image) }` );
-
-                        var ext = texpath.match( /[^\.]$/ )[0];
-                        var data = await zip.file( texpath ).async( 'uint8array' );
-                        var blob = new Blob( [ data ], 'application/octet-binary' );
-
-                        // Create data url with the extension
-                        tex.image.addEventListener( 'load', () => tex.needsUpdate = true, { once: true } );
-                        tex.image.src = URL.createObjectURL( blob );
-
-                    } )()
-
-                    return tex;
-
-                }
+                var daefile = zip.file( entryfile ).asText();
 
                 // parse the result
                 var result = this._colladaLoader.parse( daefile );
+
+                for ( var name in images ) {
+                    
+                    var image = result.images[ name ];
+                    var path = decodeURI( image.init_from );
+                    var texpath = cleanPath( `${ dir }/${ cleanPath(image) }` );
+                    var data = zip.file( texpath ).asArrayBuffer();
+                    var blob = new Blob( [ data ], 'application/octet-binary' );
+                    image.build.src = URL.createObjectURL( blob );
+
+                }
 
                 // return the data
                 onLoad( result );
