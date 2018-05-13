@@ -48,15 +48,19 @@ THREE.ColladaArchiveLoader.prototype = {
             path = path.replace( /\\+/g, '/' );
             path = path.replace( /^\.?\//, '' );
 
-            var updirmatches = path.match( /(\.\.\/)*/ )[ 0 ].match( /\.\./g );
-            var updircount = updirmatches ? updirmatches.length : 0;
             var spl = path.split( '/' );
-            
-            // TODO: We need to actually modify the parent directory
-            // for every `..`
-            while (updircount --) spl.shift();
+            var newpath = [];
 
-            return spl.join( '/' );
+            while ( spl.length !== 0 ) {
+
+                var token = spl.shift();
+
+                if ( token === '..' ) newpath.pop();
+                else newpath.push( token );
+
+            }
+
+            return newpath.join( '/' );
         }
 
         if ( window.JSZip == null ) {
@@ -65,7 +69,6 @@ THREE.ColladaArchiveLoader.prototype = {
             return null;
 
         }
-
 
         try {
 
