@@ -5,11 +5,7 @@
 
 THREE.ColladaArchiveLoader = function ( manager ) {
 
-    // TODO: Use this appropriately. It's a little more complicated because
-    // the final processing is async due to jszip
-    // this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-    this.manager = THREE.DefaultLoadingManager;
-
+    this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
     this._colladaLoader = new THREE.ColladaLoader();
 
 }
