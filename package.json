@@ -2,20 +2,23 @@
   "name": "collada-archive-loader",
   "version": "0.1.2",
   "description": "THREE js loader for loading a zipped Collada Archive or ZAE file.",
-  "main": "ColladaArchiveLoader.js",
+	"main": "ColladaArchiveLoader.js",
+	"files": [
+		"ColladaArchiveLoader.js"
+	],
   "scripts": {
     "start": "static-server"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gkjohnson/zipped-collada-loader-js.git"
+    "url": "git+https://github.com/gkjohnson/collada-archive-loader-js.git"
   },
   "author": "Garrett Johnson <garrett.kjohnson@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gkjohnson/zipped-collada-loader-js/issues"
+    "url": "https://github.com/gkjohnson/collada-archive-loader-js/issues"
   },
-  "homepage": "https://github.com/gkjohnson/zipped-collada-loader-js#readme",
+  "homepage": "https://github.com/gkjohnson/collada-archive-loader-js#readme",
   "keywords": [
     "threejs",
     "three-js",
