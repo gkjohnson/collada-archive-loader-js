@@ -1,11 +1,11 @@
 {
   "name": "collada-archive-loader",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "THREE js loader for loading a zipped Collada Archive or ZAE file.",
-	"main": "ColladaArchiveLoader.js",
-	"files": [
-		"ColladaArchiveLoader.js"
-	],
+  "main": "ColladaArchiveLoader.js",
+  "files": [
+    "ColladaArchiveLoader.js"
+  ],
   "scripts": {
     "start": "static-server"
   },
