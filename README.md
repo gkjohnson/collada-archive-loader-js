@@ -1,4 +1,4 @@
-**In Progress**
+**Alpha to be used with Esko Studio Export to collada**
 
 # zipped-collada-loader-js
 THREE js loader for loading a zipped ZAE Collada file
