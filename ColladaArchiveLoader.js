@@ -28,8 +28,8 @@ THREE.ColladaArchiveLoader.prototype = {
 
 	},
 
-	parse: function ( data ) {
-
+    parse: function (data) {
+        
 		function cleanPath( path ) {
 
 			if ( /^file:/.test( path ) ) {
@@ -56,7 +56,33 @@ THREE.ColladaArchiveLoader.prototype = {
 
 			return newpath.join( '/' );
 
-		}
+        }
+        //Since collada loader fails to generate 3d model with images
+        //I'm replacing dae images path the archive blobs
+        
+        function setImagesToBlob(daefile, dir, zip) {
+            //regex to locate all init_from tagss
+            var initFromTagPattern = new RegExp("<init_from>(.*(\\.png|\\.jpg|\\.jpeg))</init_from>", "gm");
+            //Set matched tags path to image blobs
+            var matchInitFromTag;
+            while ((matchInitFromTag = initFromTagPattern.exec(daefile)) !== null) {
+                var imgPath = matchInitFromTag[1];
+                var imgInitFromPath = decodeURI(imgPath);
+                var imgFilePath = cleanPath(`${dir}/${cleanPath(imgInitFromPath)}`);
+                try {
+                    var fileBlob = zip.file(imgFilePath).asArrayBuffer();
+                    var blob = new Blob([fileBlob], { type: 'image/png' });
+                    //var bytes = new Uint8Array(fileBlob);
+                    var newTag = "<init_from>" + URL.createObjectURL(blob) + "</init_from>";
+                    daefile = daefile.replace(matchInitFromTag[0], newTag);
+                } catch (e) {
+                    //If file is not found in archive it will be loaded according to path in dae file
+                    console.error('ColladaArchiveLoader : e');
+                }
+			}
+            return daefile;
+        }
+
 
 		if ( window.JSZip == null ) {
 
@@ -105,22 +131,24 @@ THREE.ColladaArchiveLoader.prototype = {
 
 			// get the dae file and directory
 			var dir = entryfile.replace( /[^\/]*$/g, '' );
-			var daefile = zip.file( entryfile ).asText();
+            var daefile = zip.file(entryfile).asText();
+            //Update daefile with zipped blobs
+            daefile = setImagesToBlob(daefile, dir, zip);
+            var result = this._colladaLoader.parse(daefile);
 
-			// parse the result
-			var result = this._colladaLoader.parse( daefile );
 
-			for ( var name in result.images ) {
+           // When exporting from
+            //This code is commented out as it does not work with Esko zae file
+            //See that path variable for decoded string is not in use
+            //for (var name in result.images) {
 
-				var image = result.images[ name ];
-				var path = decodeURI( image.init_from );
-				var texpath = cleanPath( `${ dir }/${ cleanPath( image ) }` );
-				var data = zip.file( texpath ).asArrayBuffer();
-				var blob = new Blob( [ data ], 'application/octet-binary' );
-				image.build.src = URL.createObjectURL( blob );
-
-			}
-
+            //    var image = result.images[name];
+            //    var path = decodeURI(image.init_from);
+            //    var texpath = cleanPath(`${dir}/${cleanPath(image)}`);
+            //    var data = zip.file(texpath).asArrayBuffer();
+            //    var blob = new Blob([data], 'application/octet-binary');
+            //    image.build.src = URL.createObjectURL(blob);
+            //}
 			// return the data
 			return result;
 
