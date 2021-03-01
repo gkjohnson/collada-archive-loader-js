@@ -37,10 +37,10 @@
     "eslint-config-mdcs": "^4.2.3",
     "jszip": "^2.6.0",
     "static-server": "^2.2.0",
-    "three": "^0.91.0"
+    "three": "^0.125.0"
   },
   "peerDependencies": {
     "jszip": "^2.6.0",
-    "three": "^0.91.0"
+    "three": "^0.125.0"
   }
 }
